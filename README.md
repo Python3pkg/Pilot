@@ -89,7 +89,9 @@ def count_friends(node):
 
 from pilot import Callback, Pilot
 callback = DictCallback(count_friends, containers=['dict'])
-Pilot(callbacks=[callback]).fly(data)
+pilot = Pilot(callbacks=[callback])
+newdata = pilot.fly(data)
+#newdata is now annotated with node information
 ```
 
 Here are the keyword args you can supply in a callback configuration, most of which act as filters:

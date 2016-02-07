@@ -45,7 +45,7 @@ class Pilot(object):
             'parent': rootparent
         }
         try:
-            self.__process(**process_kwargs)
+            return self.__process(**process_kwargs)
         except FlightBreak:
             pass
 
@@ -96,7 +96,8 @@ class Pilot(object):
                 if self.config.traversal_mode is 'breadth':
                     queue.append(**process_kwargs)
                 else:
-                    self.__process(**process_kwargs)
+                    child = self.__process(**process_kwargs)
+                    node.val[k] = child
 
         # list processing
         elif node.container == ContainerType.list:
@@ -110,9 +111,12 @@ class Pilot(object):
                 if self.config.traversal_mode is 'breadth':
                     queue.append(**process_kwargs)
                 else:
-                    self.__process(**process_kwargs)
+                    child = self.__process(**process_kwargs)
+                    node.val[i] = child
 
         self.__exec_callbacks(node, 1)
+
+        return node.val
 
 
     def __exec_callbacks(self, node, position):
