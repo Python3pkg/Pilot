@@ -242,8 +242,8 @@ Node relationship accessors
 -  ``orphans()``: A method that returns all connected root nodes.
 -  ``ancestors()``: A method that returns a list of all ancestor nodes,
    going back to the root.
--  ``descendants()``: A method that returns a list of all ancestor
-   nodes, going back to the root.
+-  ``descendants()``: A method that returns a list of all descendant
+   nodes.
 
 Each relationship accessor can be pased the following keyword arguments:
 

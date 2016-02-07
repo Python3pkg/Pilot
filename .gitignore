@@ -3,3 +3,4 @@ pilot.egg-info/
 dist/
 build/
 notes.txt
+setup.py
