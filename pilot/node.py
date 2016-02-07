@@ -107,13 +107,19 @@ class Node(object):
         return self.__filter_edges(None, filters, siblings)
 
     def add_parent(self, node):
-        self.rel.parents.append(node)
+        if node not in self.rel.parents:
+            self.rel.parents.append(node)
+            node.add_child(self)
 
     def add_child(self, node):
-        self.rel.children.append(node)
+        if node not in self.rel.children:
+            self.rel.children.append(node)
+            node.add_parent(self)
     
     def add_neighbor(self, node):
-        self.rel.neighbors.append(node)            
+        if node not in self.rel.neighbors:
+            self.rel.neighbors.append(node)     
+            node.add_neighbor(self)       
 
 
     # /~~private methods~~/ -----------------------------------------
