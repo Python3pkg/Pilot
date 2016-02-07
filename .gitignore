@@ -3,5 +3,3 @@ pilot.egg-info/
 dist/
 build/
 notes.txt
-setup.py
-setup.cfg
