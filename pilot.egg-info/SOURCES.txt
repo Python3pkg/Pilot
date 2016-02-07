@@ -1,0 +1,12 @@
+setup.cfg
+setup.py
+pilot/__init__.py
+pilot/callback.py
+pilot/definitions.py
+pilot/exception.py
+pilot/node.py
+pilot/pilot.py
+pilot.egg-info/PKG-INFO
+pilot.egg-info/SOURCES.txt
+pilot.egg-info/dependency_links.txt
+pilot.egg-info/top_level.txt
