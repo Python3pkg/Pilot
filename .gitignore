@@ -1,4 +1,4 @@
 *.pyc
-pilot.egg-info
-dist
-build
+pilot.egg-info/
+dist/
+build/
