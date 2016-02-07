@@ -1,13 +1,14 @@
 """Pilot is a python library for traversing object trees and graphs
 See:
 https://github.com/tckerr/Pilot
+https://pypi.python.org/pypi/pilot
 """
 
 from setuptools import setup, find_packages
 
 setup(
     name='pilot',
-    version='0.0.3',
+    version='0.0.5',
     description='Pilot is a python library for traversing object trees and graphs',
     long_description='Pilot is a python library that allows for injecting callback hooks into tree/graph traversal, as well as for providing metadata about traversed nodes and their relationships.',
     url='https://github.com/tckerr/Pilot',

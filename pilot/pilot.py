@@ -1,12 +1,46 @@
-from pprint import pprint
 from node import NodeFactory
 from definitions import ContainerType
 from exception import (
     InvalidConfiguration, 
     FlightBreak,)
-
+from callback import Callback
 
 class PilotConfig(object):
+
+    def set(self, key, val):
+        if key == 'callbacks':
+            self.__clear_callbacks()
+            requires_sort = False
+            while len(val) > 0:
+                callback = val.pop()
+                for pos in callback.positions:
+                    if pos not in ('pre', 'post'):
+                        raise InvalidConfiguration("Invalid callback position.")
+                    self.callbacks[pos].append(callback)
+                    requires_sort = True
+            if requires_sort:
+                self.__sort_callbacks()
+        else:
+            if key == 'callback_sort':
+                key = '__callback_sort'
+            try:
+                setattr(self, key, val)
+            except:
+                raise InvalidConfiguration("'{}' is not a valid Pilot configuration option.".format(k))
+
+    def __sort_callbacks(self):
+        sort = {'cmp': self.callback_sort} if self.callback_sort_mode is 1 else {'key': self.callback_sort}
+        self.callbacks['pre'] = sorted(self.callbacks['pre'], **sort)
+        self.callbacks['post'] = sorted(self.callbacks['post'], **sort)
+
+    def __clear_callbacks(self):
+        self.callbacks['pre'] = []
+        self.callbacks['post'] = []
+
+    @property
+    def callback_sort(self):
+        return self.__callback_sort
+
     structure = "Tree"
     node_visit_limit = 1
     traversal_mode = 'depth'
@@ -14,27 +48,26 @@ class PilotConfig(object):
     callbacks = {
         'pre': [],
         'post': []
-    }
+    }    
+    callback_sort_mode = 0 # 1 for cmp
+    __callback_sort = lambda self, x: x.priority
 
 
 class Pilot(object):
-    def __init__(self, **kwargs):
-        self.configure(**kwargs)
+    def __init__(self, *callbacks, **settings):     
+        self.config = PilotConfig()        
+        self.configure(*callbacks, **settings)
 
-    def configure(self, **kwargs):
-        self.config = getattr(self, 'config', None) or PilotConfig()
-
-        callbacks = kwargs.pop('callbacks', [])
-        while len(callbacks) > 0:
-            callback = callbacks.pop()
-            for pos in callback.positions:
-                self.config.callbacks[pos].append(callback)
-        
+    def configure(self, *callbacks, **kwargs):
+        cbs = []
+        if len(callbacks) > 0:
+            if 'callbacks' in kwargs:
+                raise InvalidConfiguration("You cannot pass a list of callbacks and specify a keyword callback list in the same configuration.")
+            for fn in callbacks:
+                cbs.append(Callback(fn))
+            kwargs['callbacks'] = cbs
         for k, v in kwargs.iteritems():
-            try:
-                setattr(self.config, k, v)
-            except:
-                raise InvalidConfiguration("'{}' is not a valid Pilot configuration option.".format(k))
+            self.config.set(k, v)
 
 
     def fly(self, obj, rootkey=None, rootpath=None, rootparent=None):
@@ -48,10 +81,6 @@ class Pilot(object):
             return self.__process(**process_kwargs)
         except FlightBreak:
             pass
-
-
-    def describe(self, data):
-        pprint(data)
 
     @staticmethod
     def halt():

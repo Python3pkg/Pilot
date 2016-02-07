@@ -21,9 +21,10 @@ class NoneType_extended(object):
 
 
 class RelationshipMap(object):
-    children = []
-    parents = []
-    neighbors = [] 
+    def __init__(self):        
+        self.children = []
+        self.parents = []
+        self.neighbors = [] 
 
 
 class Node(object):
@@ -52,78 +53,124 @@ class Node(object):
 
 
     @property
-    def is_orphan(self, filters):
+    def is_orphan(self):
         return len(self.rel.parents) < 1
 
-    def parents(self, filters):
-        return self.__filter_edges(RelationshipType.parent, filters)
+    def parents(self, filters=None, as_value=False, as_generator=False):
+        gen = self.__filter_edges(RelationshipType.parent, filters, as_value=as_value)
+        if as_generator:
+            return gen
+        else:
+            return [i for i in gen]
 
-    def parent(self, filters):
-        parents = self.__filter_edges(RelationshipType.parent, filters)
-        return parents[0] if parents else None
+    def parent(self, filters=None, as_value=False, as_generator=False):
+        parents = self.__filter_edges(RelationshipType.parent, filters, as_value=as_value)
+        return parents.next() if parents else None
 
-    def children(self, filters):
-        return self.__filter_edges(RelationshipType.child, filters)
+    def children(self, filters=None, as_value=False, as_generator=False):
+        gen = self.__filter_edges(RelationshipType.child, filters, as_value=as_value)
+        if as_generator:
+            return gen
+        else:
+            return [i for i in gen]
 
-    def neighbors(self, filters):
-        return self.__filter_edges(RelationshipType.neighbor, filters)
+    def neighbors(self, filters=None, as_value=False, as_generator=False):
+        gen = self.__filter_edges(RelationshipType.neighbor, filters, as_value=as_value)
+        if as_generator:
+            return gen
+        else:
+            return [i for i in gen]
 
-    def ancestors(self, filters):
-        ancestors = []
-        parents = self.parents()
-        while parents.length > 0:
-            parent = parents.pop()
-            if parent in ancestors:
-                continue            
-            ancestors.append(parent);
-            grand_parents = parent.parents();
-            if grand_parents:
-                parents = parents.extend(grandParents)
-        return self.__filter_edges(None, filters, ancestors)
+    def ancestors(self, filters=None, as_value=False, as_generator=False):
+        gen = self.__ancestors(filters=filters, as_value=as_value)
+        if as_generator:
+            return gen
+        else:
+            return [i for i in gen]
 
-    def orphans(self, filters):
-        seen = [];
-        orphans = [];
-        edges = this.parents().extend(this.neighbors())
-        while edges: 
-            edge = edges.pop()
-            seen.append(edge)
-            if edge.is_orphan:
-                orphans.append(edge)
-            edge_edges = edge.parents().extend(edge.neighbors())
-            for edge_edge in edge_edges:
-                if edge_edge in seen:
-                    edges.append(edge_edge)
-        return self.__filter_edges(None, filters, orphans) 
+    def orphans(self, filters=None, as_value=False, as_generator=False):
+        gen = self.__orphans(filters=filters, as_value=as_value)
+        if as_generator:
+            return gen
+        else:
+            return [i for i in gen]
 
-    def siblings(self):
+    def siblings(self, filters=None, as_value=False, as_generator=False):
+        gen = self.__siblings(filters=filters, as_value=as_value)
+        if as_generator:
+            return gen
+        else:
+            return [i for i in gen]
+
+    def descendants(self, filters=None, as_value=False, as_generator=False):
+        gen = self.__descendants(filters=filters, as_value=as_value)
+        if as_generator:
+            return gen
+        else:
+            return [i for i in gen]
+
+    def add_parent(self, parent):
+        if parent not in self.rel.parents:            
+            self.rel.parents.append(parent)
+            parent.add_child(self)
+
+    def add_child(self, child):
+        if child not in self.rel.children:
+            self.rel.children.append(child)
+            child.add_parent(self)
+    
+    def add_neighbor(self, neighbor):
+        if neighbor not in self.rel.neighbors:
+            self.rel.neighbors.append(neighbor)     
+            neighbor.add_neighbor(self)       
+
+
+    # /~~private methods~~/ -----------------------------------------
+    def __ancestors(self, filters=None, as_value=False):
+        seen = []
+        generators = [self.parents()]
+        while generators:
+            generator = generators.pop()   
+            for parent in generator:
+                if parent in seen:
+                    continue
+                seen.append(parent)
+                if self.__edge_match(parent, filters=filters):
+                    yield parent.val if as_value else parent
+                grand_parents = parent.parents()
+                if grand_parents:
+                    generators.append(grand_parents)
+
+    def __descendants(self, filters=None, as_value=False):
+        seen = []
+        generators = [self.children()]
+        while generators:
+            generator = generators.pop()   
+            for child in generator:
+                if child in seen:
+                    continue
+                seen.append(child)
+                if self.__edge_match(child, filters=filters):
+                    yield child.val if as_value else child
+                grand_children = child.children()
+                if grand_children:
+                    generators.append(grand_children)
+
+    def __orphans(self, filters=None, as_value=False):
+        for ancestor in self.ancestors(filters=None, as_value=False):
+            if ancestor.is_orphan and self.__edge_match(ancestor, filters=filters):
+                yield ancestor.val if as_value else ancestor
+
+    def __siblings(self, filters=None, as_value=False, as_generator=False):
         parents = self.parents();
         siblings = [];
         for parent in parents:
             children = parent.children();
             for child in children:
-                if child is not self:
-                    siblings.append(child)
-        return self.__filter_edges(None, filters, siblings)
+                if child is not self and self.__edge_match(child, filters=filters):
+                    yield child.val if as_value else child
 
-    def add_parent(self, node):
-        if node not in self.rel.parents:
-            self.rel.parents.append(node)
-            node.add_child(self)
-
-    def add_child(self, node):
-        if node not in self.rel.children:
-            self.rel.children.append(node)
-            node.add_parent(self)
-    
-    def add_neighbor(self, node):
-        if node not in self.rel.neighbors:
-            self.rel.neighbors.append(node)     
-            node.add_neighbor(self)       
-
-
-    # /~~private methods~~/ -----------------------------------------
-    def __filter_edges(self, relationship_type, filters, edge_list=None):
+    def __filter_edges(self, relationship_type, filters=None, edge_list=None, as_value=False):
         if not edge_list:
             if relationship_type is RelationshipType.child:
                 edge_list = self.rel.children
@@ -131,18 +178,25 @@ class Node(object):
                 edge_list = self.rel.parents
             else:
                 edge_list = self.rel.neighbor
-        if config:            
+        if filters:            
             for edge in edge_list:
-                matched_filter = True
-                for key, val in filters.iteritems():
-                    if key not in edge or edge[key] is not val:
-                        matched_filter = False
-                        break
-                if matched_filter:
-                    matched.append(edge)
+                if self.__edge_match(edge, filters):
+                    yield edge.val if as_value else edge
         else:
-            matched = edge_list
-        return matched
+            for edge in edge_list:
+                yield edge.val if as_value else edge
+
+    def __edge_match(self, edge, filters=None):
+        if filters:
+            for key, val in filters.iteritems():
+                v = None
+                try:
+                    v = edge.val[key]
+                except:
+                    return False
+                if v != val:
+                    return False
+        return True
 
 
 class NodeMetadata(object):            

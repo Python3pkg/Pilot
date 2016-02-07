@@ -12,6 +12,8 @@ class Callback(object):
         self.positions = kwargs.pop('keys', ['pre'])
         self.classes = kwargs.pop('keys', [])
         self.containers = kwargs.pop('keys', [])
+        self.priority = kwargs.pop('priority', 0)
+        self.run_for_orphans = kwargs.pop('run_for_orphans', True)
 
     def __call__(self, node, *args, **kwargs):
          # exit for enum mode
@@ -27,6 +29,11 @@ class Callback(object):
         # exit for key misses
         if  self.keys and \
             node.key not in self.keys:
+            return
+
+        # exit for root misses
+        if  not self.run_for_orphans and \
+            node.is_orphan :
             return
 
         self.run_count += 1
