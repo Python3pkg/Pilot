@@ -246,8 +246,8 @@ class NodeFactory(object):
                         wrapper_class = NodeFactory.__node_type_factory.get(val)
                         val.__class__ = wrapper_class
                     except Exception as e:
-                        msg = "The class `{}` was declared in the old style and is not supported by Walk."
-                        msg += " Old style classes must support copying via the class's `__init__` method."
+                        msg = "Failure to convert class during traversal.\n"
+                        msg += "The class `{}` may have been declared in the old style and is not supported by Pilot."
                         raise InvalidClassConversion(msg.format(val.__class__.__name__))
 
             # now we can init the new node object in val
