@@ -132,6 +132,24 @@ def test_tree():
     assert len(data.__node__.descendants(filters={'type': 'person'})) is 13
     return 1
 
+def test_loop():
+    process_count = 200
+    nl = {}
+    def cb(node):
+        if not str(node.id) in nl:
+            nl[str(node.id)] = 1
+        else:
+            nl[str(node.id)] += 1
+    a = {}
+    b = {'a':a}
+    a['b'] = b
+    pilot = Pilot(cb)
+    pilot.config.node_visit_limit = process_count
+    data = pilot.fly(a)
+    assert data.__node__.processed is process_count
+    assert data['b'].__node__.processed is process_count
+    return 1
+
 
 def test_dtree():
     return 1
@@ -139,8 +157,9 @@ def test_dtree():
 def test_graph():
     return 1
 
-count += test_types()
-count += test_tree()
+#count += test_types()
+#count += test_tree()
+count += test_loop()
 #count += test_dtree()
 #count += test_graph()
 print "{} test(s) completed successfully.".format(str(count))

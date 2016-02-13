@@ -26,9 +26,13 @@ class RelationshipMap(object):
         self.parents = []
         self.neighbors = [] 
 
+class NodeList(dict):
+    pass
+
+# make a has_config module
 
 class Node(object):
-    __id_counter = 0   
+    __id_counter = 0 
 
     @classmethod
     def __generate_id(self):
@@ -41,6 +45,7 @@ class Node(object):
         self.val = val
         self.path = path
         self.encountered = 1
+        self.processed = 0
         self.rel = RelationshipMap()
         
         # TODO: improve this
@@ -214,15 +219,17 @@ class NodeTypeFactory(dict):
             self[vclass_id] = wrapper_class
         return wrapper_class
 
-
 class NodeFactory(object):
-    __node_list = {}
+    
+    __node_list = NodeList()
     __node_type_factory = NodeTypeFactory()   
 
     @staticmethod
-    def convert(key, val, path):
+    def convert(key, oldval, path):
+        val = oldval
+        existing = NodeFactory.__node_list.get(str(id(oldval)))
         # if the value is already extended, return the val
-        if not getattr(val, '__node__', None):
+        if not existing:       
             base_class = val.__class__
             if base_class is None.__class__:
                 val = NoneType_extended()
@@ -252,8 +259,11 @@ class NodeFactory(object):
 
             # now we can init the new node object in val
             val.__node__ = Node(key, val, path, base_class)
+            NodeFactory.__node_list[str(id(oldval))] = val
+            
         else:
+            val = existing
             val.__node__.encountered += 1
+        
         return val
-
 

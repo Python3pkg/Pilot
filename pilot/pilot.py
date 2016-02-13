@@ -108,7 +108,8 @@ class Pilot(object):
 
         # exit if we've visited this node enough
         if self.config.node_visit_limit != -1 and node.encountered > self.config.node_visit_limit:
-            return
+            return            
+        node.processed += 1
 
         # match and run callbacks
         self.__exec_callbacks(node, 0)
