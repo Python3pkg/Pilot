@@ -94,7 +94,7 @@ class Pilot(object):
         # build node
         key = kwargs.pop('key', None)
         val = kwargs.pop('val', None)
-        path = kwargs.pop('path', None)        
+        path = kwargs.pop('path', '') or ''  
         converted = NodeFactory.convert(key, val, path)
         node = converted.__node__
 
@@ -120,7 +120,7 @@ class Pilot(object):
                 process_kwargs = {
                     'key': k,
                     'val': v,
-                    'path': None,
+                    'path': path + '.' + k,
                     'parent': node
                 }
                 if self.config.traversal_mode is 'breadth':
@@ -135,7 +135,7 @@ class Pilot(object):
                 process_kwargs = {
                     'key': None,
                     'val': item,
-                    'path': None,
+                    'path': path + '.' + str(i),
                     'parent': node
                 }
                 if self.config.traversal_mode is 'breadth':

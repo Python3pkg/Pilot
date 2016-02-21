@@ -150,6 +150,16 @@ def test_loop():
     assert data['b'].__node__.processed is process_count
     return 1
 
+def test_path():
+    from copy import deepcopy
+    data = deepcopy(data_small)
+    def cb(node):
+        print node.path
+
+    pilot = Pilot(cb)
+    pilot.fly(data, rootpath='root')
+    return 1
+
 
 def test_dtree():
     return 1
@@ -157,9 +167,9 @@ def test_dtree():
 def test_graph():
     return 1
 
-#count += test_types()
-#count += test_tree()
+count += test_types()
+count += test_tree()
 count += test_loop()
-#count += test_dtree()
+count += test_dtree()
 #count += test_graph()
 print "{} test(s) completed successfully.".format(str(count))

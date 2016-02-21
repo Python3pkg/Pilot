@@ -229,7 +229,8 @@ class NodeFactory(object):
         val = oldval
         existing = NodeFactory.__node_list.get(str(id(oldval)))
         # if the value is already extended, return the val
-        if not existing:       
+        # unless its a "value" container, since those are terminating points
+        if not existing or existing.__node__.container is ContainerType.value:       
             base_class = val.__class__
             if base_class is None.__class__:
                 val = NoneType_extended()
