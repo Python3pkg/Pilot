@@ -1,9 +1,9 @@
-from node import NodeFactory
-from definitions import ContainerType
-from exception import (
+from .node import NodeFactory
+from .definitions import ContainerType
+from .exception import (
     InvalidConfiguration, 
     FlightBreak,)
-from callback import Callback
+from .callback import Callback
 
 class PilotConfig(object):
 
@@ -66,7 +66,7 @@ class Pilot(object):
             for fn in callbacks:
                 cbs.append(Callback(fn))
             kwargs['callbacks'] = cbs
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             self.config.set(k, v)
 
 
@@ -116,7 +116,7 @@ class Pilot(object):
 
         # object processing
         if node.container == ContainerType.dict:
-            for k, v in node.val.iteritems():
+            for k, v in node.val.items():
                 process_kwargs = {
                     'key': k,
                     'val': v,

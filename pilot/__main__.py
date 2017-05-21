@@ -1,12 +1,12 @@
 import sys
 
 def usage():
-    print "Usage:\n    `$ python pilot test`: execute the test suite for pilot"
+    print("Usage:\n    `$ python pilot test`: execute the test suite for pilot")
 
 
 if len(sys.argv) > 1:
     if sys.argv[1] == 'test':
-        import tests
+        from . import tests
     else:
         usage()
 

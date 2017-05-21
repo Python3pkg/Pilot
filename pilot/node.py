@@ -1,5 +1,5 @@
-from exception import InvalidClassConversion
-from definitions import (
+from .exception import InvalidClassConversion
+from .definitions import (
     RelationshipType, 
     ContainerType,)
 
@@ -70,7 +70,7 @@ class Node(object):
 
     def parent(self, filters=None, as_value=False, as_generator=False):
         parents = self.__filter_edges(RelationshipType.parent, filters, as_value=as_value)
-        return parents.next() if parents else None
+        return next(parents) if parents else None
 
     def children(self, filters=None, as_value=False, as_generator=False):
         gen = self.__filter_edges(RelationshipType.child, filters, as_value=as_value)
@@ -193,7 +193,7 @@ class Node(object):
 
     def __edge_match(self, edge, filters=None):
         if filters:
-            for key, val in filters.iteritems():
+            for key, val in filters.items():
                 v = None
                 try:
                     v = edge.val[key]

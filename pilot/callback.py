@@ -1,5 +1,5 @@
-from definitions import ContainerType
-from exception import InvalidConfiguration
+from .definitions import ContainerType
+from .exception import InvalidConfiguration
 
 class Callback(object):
     def __init__(self, function, **kwargs):

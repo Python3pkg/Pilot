@@ -1,5 +1,5 @@
-from pilot import Pilot
-from callback import Callback, ValueCallback, DictCallback
+from .pilot import Pilot
+from .callback import Callback, ValueCallback, DictCallback
 
 data_small = {
   "type": "person",
@@ -93,9 +93,9 @@ def test_types():
     class C(A, B): pass
     object_list = [
         "test",
-        u'test',
+        'test',
         1,
-        1L,
+        1,
         1.0,
         [],
         {},
@@ -161,4 +161,4 @@ count += test_tree()
 count += test_loop()
 count += test_dtree()
 #count += test_graph()
-print "{} test(s) completed successfully.".format(str(count))
+print("{} test(s) completed successfully.".format(str(count)))

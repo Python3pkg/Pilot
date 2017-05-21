@@ -1,9 +1,9 @@
-from callback import (
+from .callback import (
     Callback,
     ListCallback,
     ValueCallback,
     DictCallback)
 
-from pilot import (
+from .pilot import (
     PilotConfig,
     Pilot)
